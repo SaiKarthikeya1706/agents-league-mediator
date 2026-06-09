@@ -1,0 +1,5 @@
+SALES DISCOUNT POLICY:
+- Standard discounts up to 10% are pre-approved by Sales Managers.
+- Discounts between 11% and 20% require Finance Director approval.
+- Any discount above 20% requires a formal business case, review by the Arbitration Board, and final approval from the CFO.
+- All deals above 20% must include a minimum 2-year contract term.
