@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+.env
+.venv/
+venv/
+ENV/
+env/
+
+# IDE/System
+.vscode/
+.idea/
+.DS_Store
+
+# Data (Optional: only if you want to keep data out of Git)
+data/*.json
