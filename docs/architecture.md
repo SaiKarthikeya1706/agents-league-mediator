@@ -1,23 +1,37 @@
-# Mediator AI: Enterprise Policy Arbitration Framework
+# System Architecture: Mediator & Logic Engine
 
-## 1. Executive Summary
-Mediator AI provides an autonomous, auditable, and grounded resolution layer for cross-departmental policy friction. By utilizing Retrieval-Augmented Generation (RAG) atop Microsoft Foundry IQ, the system eliminates human-in-the-loop latency for routine policy disputes.
+## 1. Architectural Overview
+The Mediator & Logic Engine is built on a **Stateful Orchestration Pattern** using LangGraph. The core design principle is **decoupling**: we isolate knowledge (Data Layer), reasoning (Agent Nodes), and context (Router/State).
 
-## 2. Technical Architecture
-The framework operates as a **Stateful Multi-Agent System (MAS)**:
+## 2. Agent Logic Flow
+The system operates as a finite state machine. The `router_node` determines the path, and the state dictionary (`AgentState`) maintains the conversation history and decision trail.
 
-* **Ingestion Layer:** Standardized API endpoints that ingest conflict triggers (e.g., Salesforce/ERP alerts).
-* **Arbitration Engine (The "Brain"):** A ReAct-based agentic workflow utilizing GPT-4o, optimized for strict adherence to organizational policy.
-* **Knowledge Grounding (Foundry IQ):** The source of truth. The engine performs semantic retrieval on internal governance documents (PDFs/SharePoint) to ensure all resolutions are policy-compliant.
-* **Auditability Layer:** Every resolution generates a JSON-based "reasoning trace," capturing the decision-path, policy citations used, and confidence scores.
+```mermaid
+graph TD
+    A[User Input] --> B(Router Node)
+    B -->|Policy Request| C[Policy Node (Foundry IQ)]
+    B -->|General Request| D[Search Node]
+    B -->|Insights Request| E[Insights Node (Fabric IQ)]
+    B -->|Risk Detected| F[Safety Node (Guardrails)]
+    
+    C --> G[End / Response]
+    D --> G
+    E --> G
+    F --> G
 
-## 3. The Arbitration Workflow
-1.  **State Initialization:** Capture conflict metadata (e.g., `Department: Sales`, `Requested_Discount: 30%`).
-2.  **Constraint Retrieval:** Query Foundry IQ for the active *Finance Margin Policy*.
-3.  **Policy Synthesis:** The agent evaluates the delta between the requested parameter and the policy ceiling.
-4.  **Verdict Generation:** The agent returns a decision: `APPROVED`, `REJECTED`, or `EXEMPTION_REQUESTED`, complete with a formal policy citation.
 
-## 4. Operational Excellence (Non-Functional Requirements)
-* **Deterministic Reasoning:** Use of system-level "Chain-of-Thought" prompting to prevent hallucination.
-* **Secure Governance:** Adherence to enterprise identity management via `DefaultAzureCredential`.
-* **Observability:** Integrated with Azure AI monitoring to track agent performance, latency, and token consumption.
+## 3. IQ Layer Integration Deep-Dive
+
+Foundry IQ (Policy Grounding)
+The policy_node does not rely on LLM training data. It utilizes a RAG-lite pattern where the policy.txt file is injected into the system prompt context at runtime. This ensures the model treats the policy as the absolute source of truth.
+Fabric IQ (Business Logic)
+The insights_node performs Semantic Reasoning. By passing the structured synthetic_learners.json (a JSON object) into the LLM, we allow the agent to treat "Role," "Status," and "Readiness" as first-class entities rather than simple text tokens.
+Work IQ (Contextual Awareness)
+The router_node functions as the Cognitive Gatekeeper. It uses an LLM-based classifier to map user intent into specific execution paths, ensuring that sensitive requests or complex queries are handled by the appropriate specialized node.
+
+
+## 4. Design Decisions
+
+State Management: We use Annotated[List[BaseMessage], operator.add] within LangGraph. This ensures that every node in the graph has access to the full conversation context (Chat History) without needing to manually pass session data.
+Safety Fallback: The safety check is placed at the entry point (The Router). By intercepting potentially sensitive inputs before they hit the specialized reasoning nodes, we reduce the blast radius of any "hallucination" or "prompt injection" risks.
+Modularity: Each agent node is designed as a standalone function. This makes it trivial to swap the search_node for a more complex tool-calling agent (e.g., Tavily Search) in the future without refactoring the core graph.
