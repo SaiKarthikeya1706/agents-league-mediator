@@ -9,12 +9,11 @@ The system operates as a finite state machine. The `router_node` determines the 
 ```mermaid
 graph TD
     A[User Input] --> B(Router Node)
-    B -->|Policy Request| C[Policy Node (Foundry IQ)]
+    B -->|Policy Request| C[Policy Node]
     B -->|General Request| D[Search Node]
-    B -->|Insights Request| E[Insights Node (Fabric IQ)]
-    B -->|Risk Detected| F[Safety Node (Guardrails)]
-    
-    C --> G[End / Response]
+    B -->|Insights Request| E[Insights Node]
+    B -->|Risk Detected| F[Safety Node]
+    C --> G[End]
     D --> G
     E --> G
     F --> G
