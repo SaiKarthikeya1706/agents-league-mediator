@@ -43,6 +43,14 @@ The **Mediator & Logic Engine** is a durable, Python-based orchestration framewo
 
 ---
 
+### 🎥 Visual Proof & Execution
+To see the Mediator & Logic Engine in action, please refer to the **Project Gallery** on our submission page, which includes:
+* **Reasoning Trace UI:** Live execution traces showing the multi-step reasoning loops.
+* **PII Guardrail Demo:** Example of the system intercepting unauthorized requests.
+* **Policy Arbitration:** Screenshots of the agent citing policy documents in its final ruling.
+
+---
+
 ## ⚙️ Quick Start Guide
 
 To run the **Mediator & Logic Engine** locally, use the following commands in your terminal:
@@ -66,9 +74,3 @@ echo "GOOGLE_API_KEY=your_actual_api_key_here" > .env
 # 5. Launch the application
 python3 -m streamlit run src/app.py
 
----
-### 🎥 Visual Proof & Execution
-To see the Mediator & Logic Engine in action, please refer to the **Project Gallery** on our submission page, which includes:
-* **Reasoning Trace UI:** Live execution traces showing the multi-step reasoning loops.
-* **PII Guardrail Demo:** Example of the system intercepting unauthorized requests.
-* **Policy Arbitration:** Screenshots of the agent citing policy documents in its final ruling.
