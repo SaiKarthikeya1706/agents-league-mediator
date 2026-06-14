@@ -1,5 +1,7 @@
 # Mediator & Logic Engine: Autonomous Enterprise Arbitration Framework
 
+![Mediator & Logic Engine Logo](assets/agents_AI.png)
+
 ## 🧠 Challenge Submission
 **Track:** Reasoning Agents with Microsoft Foundry  
 **Project Objective:** A dual-purpose analytical platform that combines strict organizational policy arbitration (**The Mediator**) with a powerful, search-enabled engine for real-time information discovery and complex problem-solving (**The Logic Engine**).
