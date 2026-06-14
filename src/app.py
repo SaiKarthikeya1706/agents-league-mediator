@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-from src.main import run_agent 
+from main import run_agent 
 from dotenv import load_dotenv
 
 # --- Setup & Config ---
