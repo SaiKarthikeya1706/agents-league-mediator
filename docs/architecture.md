@@ -3,6 +3,50 @@
 ## 1. Architectural Overview
 The Mediator & Logic Engine is built on a **Stateful Orchestration Pattern** using LangGraph. The core design principle is **decoupling**: we isolate knowledge (Data Layer), reasoning (Agent Nodes), and context (Router/State).
 
+```mermaid
+graph TD
+    %% User Interaction
+    subgraph UI ["1. User Interaction"]
+        User((User Query)) --> Streamlit[Streamlit App]
+        GitHub[GitHub Copilot Chat] -.-> Streamlit
+    end
+
+    %% Reasoning Engine
+    subgraph Reasoning ["2. Reasoning & Orchestration (LangGraph)"]
+        Streamlit --> Router{Router Node}
+        Router --> |Route Intent| Policy[Policy/Insights/Search Node]
+        Policy --> |Enforce Logic| Response[Response Generator Node]
+        Safety[Safety Node] -.-> Router
+        Safety -.-> Response
+    end
+
+    %% IQ Layers
+    subgraph IQ ["3. Data Grounding & Insights"]
+        Policy --> |RAG Pattern| FIQ[Foundry IQ: policy.txt]
+        Policy --> |Semantic Analysis| FabIQ[Fabric IQ: synthetic_learners.json]
+        Policy --> |Contextual Routing| WIQ[Work IQ / M365 Copilot]
+    end
+
+    %% Production/Dev
+    subgraph Dev ["4. Production Strategy"]
+        GitHubCode[GitHub / CI/CD] --> pytest[pytest / Testing]
+        pytest --> Deploy[Azure Production]
+        Deploy --> AKV[Azure Key Vault]
+        Deploy --> MI[Managed Identities]
+    end
+
+    %% Stylings
+    classDef node fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef iq fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    classDef safety fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
+    
+    class Router,Policy,Response node;
+    class FIQ,FabIQ,WIQ iq;
+    class Safety safety;
+```
+
+
+
 ## 2. Agent Logic Flow
 The system operates as a finite state machine. The `router_node` determines the path, and the state dictionary (`AgentState`) maintains the conversation history and decision trail.
 
