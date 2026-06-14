@@ -1,6 +1,6 @@
 # Mediator & Logic Engine: Autonomous Enterprise Arbitration Framework
 
-![Mediator & Logic Engine Logo](assets/agents_AI.png)
+![Mediator & Logic Engine Logo](assets/agents_AI.jpg)
 
 ## 🧠 Challenge Submission
 **Track:** Reasoning Agents with Microsoft Foundry  
