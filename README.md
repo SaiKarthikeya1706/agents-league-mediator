@@ -55,7 +55,7 @@ python3 -m venv venv
 source venv/bin/activate  # On Windows, use: venv\Scripts\activate
 
 # 3. Install dependencies
-pip install langgraph langchain-google-genai langchain-community streamlit python-dotenv
+pip install -r requirements.txt
 
 # 4. Configure environment variables
 # Create a .env file and add your Google API Key

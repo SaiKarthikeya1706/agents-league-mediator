@@ -1,7 +1,17 @@
-import streamlit as st
+import sys
 import os
-from main import run_agent 
+
+# --- Path Injection Fix ---
+# This ensures Python can see the root directory, allowing 'from src.main' to work
+# regardless of where you are in the terminal.
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if root_path not in sys.path:
+    sys.path.append(root_path)
+
+# --- Standard Imports ---
+import streamlit as st
 from dotenv import load_dotenv
+from src.main import run_agent 
 
 # --- Setup & Config ---
 load_dotenv()
@@ -39,7 +49,7 @@ def main():
                     # Capture the result which contains path and content
                     result = run_agent(user_query)
                     
-                    # 1. Visualization: Reasoning Trace (Crucial for Challenge Submission)
+                    # 1. Visualization: Reasoning Trace
                     with st.expander("🔍 Reasoning Trace & Observability"):
                         st.write(f"**Targeted Path:** {result['path'].upper()}")
                         st.write(f"**Orchestration Status:** Success")
