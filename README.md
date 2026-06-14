@@ -49,7 +49,7 @@ To run the **Mediator & Logic Engine** locally, use the following commands in yo
 
 ```bash
 # 1. Clone the repository
-git clone <your-repository-url>
+git clone https://github.com/SaiKarthikeya1706/agents-league-mediator
 cd agents-league-mediator
 
 # 2. Create and activate a virtual environment
