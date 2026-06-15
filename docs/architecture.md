@@ -3,6 +3,10 @@
 ## 1. Architectural Overview
 The Mediator & Logic Engine is built on a **Stateful Orchestration Pattern** using LangGraph. The core design principle is **decoupling**: we isolate knowledge (Data Layer), reasoning (Agent Nodes), and context (Router/State).
 
+
+## 2. Agent Logic Flow
+The system operates as a finite state machine. The `router_node` determines the path, and the state dictionary (`AgentState`) maintains the conversation history and decision trail.
+
 ```mermaid
 graph TD
     %% Nodes representing Agents and Logic Nodes
@@ -54,23 +58,6 @@ graph TD
     class RouterNode route;
 ```
 
-
-
-## 2. Agent Logic Flow
-The system operates as a finite state machine. The `router_node` determines the path, and the state dictionary (`AgentState`) maintains the conversation history and decision trail.
-
-```mermaid
-graph TD
-    A[User Input] --> B(Router Node)
-    B -->|Policy Request| C[Policy Node]
-    B -->|General Request| D[Search Node]
-    B -->|Insights Request| E[Insights Node]
-    B -->|Risk Detected| F[Safety Node]
-    C --> G[End]
-    D --> G
-    E --> G
-    F --> G
-``` 
 
 ## 3. IQ Layer Integration Deep-Dive
 
