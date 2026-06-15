@@ -4,19 +4,20 @@
 
 ## 🧠 Challenge Submission
 **Track:** Reasoning Agents with Microsoft Foundry  
-**Project Objective:** A dual-purpose analytical platform that combines strict organizational policy arbitration (**The Mediator**) with a **5-agent autonomous enterprise framework** which is a powerful, search-enabled engine for real-time information discovery and complex problem-solving (**The Logic Engine**).
+**Project Objective:** A dual-purpose analytical platform that combines strict organizational policy arbitration (**The Mediator**) with a **5-agent autonomous enterprise framework** for real-time information discovery, dynamic document analysis, and complex problem-solving.
 
 ---
 
 ## ⚖️ The Problem
-In modern enterprise environments, requests (such as sales discounts) often lead to friction between departments. Manual, human-in-the-loop approvals are slow, inconsistent, and suffer from "precedent creep." Furthermore, current agents often lack the ability to bridge the gap between static policy and real-time business data analysis.
+In modern enterprise environments, requests (such as sales discounts) often lead to friction between departments. Manual, human-in-the-loop approvals are slow, inconsistent, and suffer from "precedent creep." Furthermore, most agents lack the ability to bridge the gap between static policy and real-time business data analysis.
 
 ## 🚀 Our Solution
 The **Mediator & Logic Engine** is a durable, Python-based orchestration **5-agent autonomous enterprise framework** built with **LangGraph**. It replaces manual gatekeeping with an autonomous **Reasoning Engine** that:
 
-1. **Policy Mediator (Foundry IQ Pattern):** Uses a dynamic RAG-based arbitration engine to ground all decisions in verified, company-approved `data/policy.txt` documentation.
-2. **Universal Logic Engine (Reasoning & Orchestration):** Leverages LangGraph to create durable, multi-step reasoning loops, ensuring the agent follows a strict logical path (Router → Policy/Search/Insights → Response).
-3. **Data-Driven Insights (Fabric IQ Pattern):** Analyzes structured synthetic team performance data (`data/synthetic_learners.json`) to provide manager-level insights, enabling the agent to reason beyond simple text retrieval.
+1. **Dynamic Context Ingestion:** Users can upload PDFs, Excel sheets, PPTs, or TXT files directly through the UI. The engine automatically adapts its knowledge base to these documents in real-time.
+2. **Policy Mediator (Foundry IQ Pattern):** Uses a dynamic RAG-based arbitration engine to ground all decisions in verified, company-approved documentation.
+3. **Universal Logic Engine (Reasoning & Orchestration):** Leverages LangGraph to create durable, multi-step reasoning loops, following a strict path (Router → Policy/Search/Insights → Response).
+4. **Data-Driven Insights (Fabric IQ Pattern):** Analyzes structured performance data to provide manager-level insights, enabling the agent to reason beyond simple text retrieval.
 
 ---
 
@@ -24,53 +25,104 @@ The **Mediator & Logic Engine** is a durable, Python-based orchestration **5-age
 
 | Microsoft IQ Layer | Our Implementation | Technical Purpose |
 | :--- | :--- | :--- |
-| **Foundry IQ** | `policy_node` (RAG Pattern) | Grounds policy rulings in a verified, version-controlled source. |
-| **Fabric IQ** | `insights_node` (Semantic Analysis) | Analyzes structured team performance data for business metrics. |
-| **Work IQ** | `router_node` (Contextual Routing) | Routes intent to the correct department-specific agent. |
+| **Foundry IQ** | `policy_node` (RAG Pattern) | Grounds policy rulings in a verified source. |
+| **Fabric IQ** | `insights_node` (Semantic Analysis) | Analyzes structured team performance data. |
+| **Work IQ** | `router_node` (Contextual Routing) | Routes intent to the correct agent node. |
+
+*Architecture Diagram:* ![Architecture](assets/architecture_diagram.png) 
+
+```mermaid
+graph TD
+    %% User Inputs
+    subgraph Inputs ["Data Inputs"]
+        User((User Query))
+        UserDocs[("Dynamic Files<br/>(PDF, XLSX, PPTX, TXT)")]
+    end
+
+    %% Reasoning & Orchestration Layer
+    subgraph Orchestration ["Mediator & Logic Engine (LangGraph)"]
+        RouterNode{"Router Agent<br/>(Contextual Router)"}
+        PolicyAgent["Policy Mediator Agent"]
+        LogicAgent["General Research Agent"]
+        InsightsAgent["Performance Insights Agent"]
+        SafetyAgent["Safety/Guardrail Agent"]
+    end
+
+    %% Integration with Microsoft IQ Layers
+    subgraph IQ_Layers ["Microsoft Intelligence Layers"]
+        WorkIQ["Work IQ<br/>(Contextual Routing)"]
+        FoundryIQ["Foundry IQ<br/>(RAG Policy Grounding)"]
+        FabricIQ["Fabric IQ<br/>(Performance Analytics)"]
+    end
+
+    %% Updated Workflow
+    User -->|Intent Analysis| RouterNode
+    UserDocs -->|Context Injection| RouterNode
+    
+    %% Routing Logic
+    RouterNode -->|PII/Risk Detected| SafetyAgent
+    RouterNode -->|Policy Inquiry| WorkIQ
+    WorkIQ --> RouterNode
+    
+    RouterNode -->|Route| PolicyAgent
+    PolicyAgent <-->|query_knowledge_base| FoundryIQ
+    
+    RouterNode -->|Route| LogicAgent
+    LogicAgent <-->|search_discovery| FoundryIQ
+    
+    RouterNode -->|Route| InsightsAgent
+    InsightsAgent <-->|semantic_analysis| FabricIQ
+
+    %% End Path
+    PolicyAgent --> Final(Final Response)
+    LogicAgent --> Final
+    InsightsAgent --> Final
+    SafetyAgent --> Final
+
+    %% Styling
+    classDef agent fill:#f0f7ff,stroke:#0078d4,stroke-width:2px;
+    classDef iq fill:#fef3e7,stroke:#d97706,stroke-width:2px;
+    classDef route fill:#f5f5f5,stroke:#333,stroke-width:2px;
+    classDef input fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,stroke-dasharray: 5 5;
+    
+    class PolicyAgent,LogicAgent,InsightsAgent,SafetyAgent agent;
+    class WorkIQ,FoundryIQ,FabricIQ iq;
+    class RouterNode route;
+    class UserDocs input;
+
+```
+
+---
 
 ## 📊 Key Features
-* **Autonomous Router:** Automatically classifies requests as "Policy Compliance," "General Research," or "Team Insights."
-* **Policy Mediator:** Provides structured, cited rulings based on real-time policy file updates.
-* **Logic & Insights Engine:** Performs research and reasons over synthetic learner datasets to evaluate operational risk.
+* **Multi-Format Support:** Seamlessly processes **PDF, XLSX, PPTX, and TXT** files via an intuitive sidebar uploader.
+* **Autonomous Router:** Automatically classifies requests and selects the best agent for the task.
 * **Observability:** Built-in **Reasoning Traces** in the UI allow developers to monitor the agent's logic flow in real-time.
 
 ---
 
 ## 🛡️ Responsible AI & Security
-* **Input Guardrails:** The system implements a proactive `safety_node` to intercept sensitive data (PII/Credentials) at the router level.
-* **Synthetic Data Hygiene:** All datasets are strictly synthetic, adhering to enterprise security standards. No real customer or employee records were used.
-* **Production Strategy:** While this prototype uses local environment variables, the system is architected to transition to **Azure Key Vault** for secrets and **Managed Identities** for secure authentication in a production enterprise environment.
-
----
-
-### 🎥 Visual Proof & Execution
-To see the Mediator & Logic Engine in action, please refer to the **Project Gallery** on our submission page, which includes:
-* **Reasoning Trace UI:** Live execution traces showing the multi-step reasoning loops.
-* **PII Guardrail Demo:** Example of the system intercepting unauthorized requests.
-* **Policy Arbitration:** Screenshots of the agent citing policy documents in its final ruling.
+* **Input Guardrails:** A proactive `safety_node` intercepts PII/Credentials at the router level.
+* **Production Ready:** Architected to transition to **Azure Key Vault** and **Managed Identities** for enterprise-grade security.
 
 ---
 
 ## ⚙️ Quick Start Guide
 
-To run the **Mediator & Logic Engine** locally, use the following commands in your terminal:
-
 ```bash
 # 1. Clone the repository
-git clone https://github.com/SaiKarthikeya1706/agents-league-mediator
+git clone [https://github.com/SaiKarthikeya1706/agents-league-mediator](https://github.com/SaiKarthikeya1706/agents-league-mediator)
 cd agents-league-mediator
 
-# 2. Create and activate a virtual environment
+# 2. Setup environment
 python3 -m venv venv
-source venv/bin/activate  # On Windows, use: venv\Scripts\activate
+source venv/bin/activate 
 
 # 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Configure environment variables
-# Create a .env file and add your Google API Key
-echo "GOOGLE_API_KEY=your_actual_api_key_here" > .env
+# 4. Configure .env
+echo "GOOGLE_API_KEY=your_key_here" > .env
 
 # 5. Launch the application
-python3 -m streamlit run src/app.py
-
+streamlit run src/app.py
