@@ -29,7 +29,7 @@ The **Mediator & Logic Engine** is a durable, Python-based orchestration **5-age
 | **Fabric IQ** | `insights_node` (Semantic Analysis) | Analyzes structured team performance data. |
 | **Work IQ** | `router_node` (Contextual Routing) | Routes intent to the correct agent node. |
 
-*Architecture Diagram:* ![Architecture](assets/architecture_diagram.png) 
+## Architecture Diagram:
 
 ```mermaid
 graph TD
