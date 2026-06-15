@@ -107,6 +107,21 @@ graph TD
 
 ---
 
+## 🏠 User Interface & Experience
+
+The Mediator & Logic Engine features an intuitive, high-performance interface built with Streamlit that prioritizes both usability and observability:
+
+* **Unified Control Array:** A dedicated sidebar acts as the "Command Center," allowing users to instantly upload custom policy and performance documents, clear conversation history, and verify active intelligence layers.
+
+* **Transparent Reasoning:** Every response is accompanied by a Reasoning Trace expander, providing a "glass-box" view into how the agent categorized your request, which IQ layers it consulted, and how it reached its final conclusion.
+
+* **Interactive Context Awareness:** The interface provides real-time feedback on the active context (Default vs. Custom), ensuring users always know exactly which data source is grounding the agent's decisions
+
+![Mediator & Logic Engine ](assets/home.png)
+
+
+---
+
 ## 📸 Demonstration of Capabilities
 
 The Mediator & Logic Engine is built to handle complex enterprise scenarios. Below are examples of the system in action:
