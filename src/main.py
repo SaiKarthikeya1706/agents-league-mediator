@@ -13,78 +13,60 @@ load_dotenv()
 class AgentState(TypedDict):
     messages: Annotated[List[BaseMessage], operator.add]
     next_step: str
+    context: str  # Added context to state
 
-# --- 2. Data Loading Helpers ---
-def load_policy():
-    """Reads the latest policy from the data folder."""
-    try:
-        with open("data/policy.txt", "r") as f:
-            return f.read()
-    except FileNotFoundError:
-        return "Policy documentation currently unavailable."
-
-def load_insights_data():
-    """Reads synthetic learner data for the Insights Agent."""
-    try:
-        with open("data/synthetic_learners.json", "r") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return []
-
-# --- 3. Nodes ---
+# --- 3. Nodes (Updated to use State Context) ---
 def router_node(state: AgentState):
     llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
     last_message = state['messages'][-1].content
     
-    # Responsible AI / Safety Check
     if any(word in last_message.lower() for word in ["pii", "password", "secret", "private"]):
         return {"next_step": "safety_error"}
 
     prompt = f"""
     Analyze the request: "{last_message}"
-    Classify the intent into one of these three categories: 'policy', 'search', or 'insights'.
-    - 'policy': Involves company rules, discount requests, or compliance procedures.
-    - 'search': General knowledge or web queries.
-    - 'insights': Team performance, learning data, or manager reports.
+    Classify intent: 'policy', 'search', or 'insights'.
     Return ONLY the category name.
     """
     decision = llm.invoke([SystemMessage(content="You are an intelligent router."), HumanMessage(content=prompt)]).content.strip().lower()
     return {"next_step": decision}
 
 def policy_node(state: AgentState):
-    """Foundry IQ Pattern: Grounded Policy Arbitration"""
+    """Grounded Policy Arbitration using injected context"""
     user_input = state['messages'][-1].content
-    policy_data = load_policy()
+    # Use context passed from Streamlit, falling back to local files if empty
+    context = state.get('context', "")
     
-    system_prompt = f"You are the Corporate Policy Mediator. Use the following policy to answer the request: {policy_data}"
+    system_prompt = f"""You are the Corporate Policy Mediator. 
+    Use the following information to answer the request. If the info is in the provided User Uploads, prioritize it:
+    {context}
+    """
     llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
     response = llm.invoke([SystemMessage(content=system_prompt), HumanMessage(content=user_input)])
     return {"messages": [HumanMessage(content=response.content)]}
 
 def search_node(state: AgentState):
-    """General Reasoning Node"""
     llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
-    response = llm.invoke(state['messages'][-1].content)
+    # Even search node can benefit from context if the user asks about the doc
+    prompt = f"Use this context to inform your answer: {state.get('context', '')}\n\nQuery: {state['messages'][-1].content}"
+    response = llm.invoke([HumanMessage(content=prompt)])
     return {"messages": [HumanMessage(content=response.content)]}
 
 def insights_node(state: AgentState):
-    """Fabric IQ Pattern: Semantic Analysis of Structured Data"""
-    data = load_insights_data()
     prompt = f"""
-    You are the Manager Insights Agent. Analyze the following team performance data: {json.dumps(data)}.
-    Summarize team readiness and recommend one improvement action for the manager.
+    You are the Manager Insights Agent. 
+    Analyze the following data: {state.get('context', '')}
+    Summarize team readiness and recommend one improvement action.
     """
     llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
     response = llm.invoke([HumanMessage(content=prompt)])
     return {"messages": [HumanMessage(content=response.content)]}
 
 def safety_node(state: AgentState):
-    """Responsible AI Fallback"""
-    return {"messages": [HumanMessage(content="I'm sorry, I cannot process this request as it involves sensitive information or potential security risks.")]}
+    return {"messages": [HumanMessage(content="I'm sorry, I cannot process this request as it involves sensitive information.")]}
 
 # --- 4. Graph Assembly ---
 workflow = StateGraph(AgentState)
-
 workflow.add_node("router", router_node)
 workflow.add_node("policy", policy_node)
 workflow.add_node("search", search_node)
@@ -96,29 +78,22 @@ workflow.set_entry_point("router")
 def should_continue(state: AgentState):
     return state['next_step']
 
-workflow.add_conditional_edges(
-    "router", 
-    should_continue, 
-    {
-        "policy": "policy", 
-        "search": "search", 
-        "insights": "insights",
-        "safety_error": "safety_error"
-    }
-)
-
-workflow.add_edge("policy", END)
-workflow.add_edge("search", END)
-workflow.add_edge("insights", END)
-workflow.add_edge("safety_error", END)
+workflow.add_conditional_edges("router", should_continue, {
+    "policy": "policy", "search": "search", "insights": "insights", "safety_error": "safety_error"
+})
+workflow.add_edge("policy", END); workflow.add_edge("search", END); 
+workflow.add_edge("insights", END); workflow.add_edge("safety_error", END)
 
 app = workflow.compile()
 
-# --- 5. Execution Interface ---
+# --- 5. Execution Interface (Updated) ---
 def run_agent(user_query, context=""):
     """Interface for the Streamlit App"""
-    # Invoke the LangGraph app
-    final_state = app.invoke({"messages": [HumanMessage(content=user_query)]})
+    # Pass context into the graph state
+    final_state = app.invoke({
+        "messages": [HumanMessage(content=user_query)],
+        "context": context
+    })
     
     return {
         "content": final_state['messages'][-1].content,

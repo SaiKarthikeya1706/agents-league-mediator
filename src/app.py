@@ -19,9 +19,8 @@ st.set_page_config(page_title="Mediator & Logic Engine", layout="wide", page_ico
 
 # --- Helper: Text Extraction ---
 def get_file_text(file):
-    # Important: Seek to start of file to ensure we read it correctly every time
     file.seek(0)
-    text = f"\n--- Source: {file.name} ---\n"
+    text = f"\n--- USER DOCUMENT: {file.name} ---\n"
     try:
         if file.type == "application/pdf":
             reader = PdfReader(file)
@@ -50,7 +49,6 @@ def main():
     st.markdown("<h1>🛡️ Mediator & Logic Engine</h1>", unsafe_allow_html=True)
     st.caption("Autonomous Policy Arbitration & Universal Reasoning System")
 
-    # Sidebar Controls
     with st.sidebar:
         st.markdown("## ⚙️ CONTROL ARRAY")
         st.write("📦 **Pre-loaded Knowledge:**")
@@ -58,7 +56,6 @@ def main():
         st.caption("✅ `synthetic_learners.json`")
         st.divider()
         
-        # Use a constant key so the widget state persists
         uploaded_files = st.file_uploader(
             "Upload Custom Docs", 
             accept_multiple_files=True, 
@@ -71,11 +68,9 @@ def main():
             st.session_state.messages = []
             st.rerun()
 
-    # Render Chat History
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]): st.markdown(msg["content"])
     
-    # Unified Chat Input
     if user_query := st.chat_input("Ask about company policy, team performance, or general research..."):
         st.session_state.messages.append({"role": "user", "content": user_query})
         with st.chat_message("user"): st.markdown(user_query)
@@ -83,28 +78,25 @@ def main():
         with st.chat_message("assistant"):
             with st.spinner("Agent is reasoning..."):
                 try:
-                    # 1. ALWAYS load the Default System Context
-                    file_context = ""
-                    try:
-                        # Ensure paths are correct relative to where you run the script
-                        if os.path.exists("data/policy.txt"):
-                            with open("data/policy.txt", "r") as f:
-                                file_context += f"\n--- Global Policy Context ---\n{f.read()}"
-                        if os.path.exists("data/synthetic_learners.json"):
-                            with open("data/synthetic_learners.json", "r") as f:
-                                file_context += f"\n--- Performance Data ---\n{f.read()}"
-                    except Exception as e:
-                        file_context += f"\n[System Note: Error loading defaults: {e}]"
+                    # 1. Structure the context explicitly
+                    file_context = "--- SYSTEM KNOWLEDGE BASE ---\n"
                     
-                    # 2. Append User Uploads (If any) using the widget state directly
+                    if os.path.exists("data/policy.txt"):
+                        with open("data/policy.txt", "r") as f:
+                            file_context += f"[GLOBAL POLICY]: {f.read()}\n"
+                    
+                    if os.path.exists("data/synthetic_learners.json"):
+                        with open("data/synthetic_learners.json", "r") as f:
+                            file_context += f"[PERFORMANCE DATA]: {f.read()}\n"
+                    
+                    # 2. Append User Uploads clearly
                     if uploaded_files:
+                        file_context += "\n--- USER PROVIDED DOCUMENTS (PRIORITIZE THESE) ---\n"
                         for file in uploaded_files:
-                            file_context += get_file_text(file)
-                        st.info(f"✅ Including {len(uploaded_files)} uploaded file(s) in context.")
-                    else:
-                        st.warning("⚠️ Using System Defaults only.")
+                            file_context += get_file_text(file) + "\n"
+                        st.info(f"✅ Including {len(uploaded_files)} file(s) in analysis.")
                     
-                    # Execution
+                    # 3. Execution
                     result = run_agent(user_query, context=file_context)
                     
                     with st.expander("🔍 Reasoning Trace & Observability"):
