@@ -137,6 +137,30 @@ The Mediator & Logic Engine is built to handle complex enterprise scenarios. Bel
 
 ---
 
+## ❓ Frequently Asked Questions
+
+### 1. How is this different from standard chatbots or generic AI tools like ChatGPT or Gemini?
+
+Standard AI tools operate as "black boxes" that rely on broad, static training data. The **Mediator & Logic Engine** is a **durable, enterprise-grade framework**. It doesn't guess; it is **grounded**. By using LangGraph, we create a deterministic execution path where every response is traced back to your specific policy or data, ensuring zero hallucination and complete auditability.
+
+### 2. Why use this instead of a simple RAG (Retrieval-Augmented Generation) application?
+
+Most RAG applications are simple "search-and-retrieve" tools that provide documents to an LLM. Our engine acts as an **Active Arbitrator**. It doesn't just find documents; it understands intent via our **Work IQ Router**, evaluates risk via our **Safety Guardrails**, and performs complex business analysis using our **Fabric IQ Insights** layer. It is a multi-step, reasoning-based orchestrator, not a simple query tool.
+
+### 3. How secure is my data within this system?
+
+Security is baked into the architecture. We implement a "Safety-First" design: sensitive requests are intercepted by our dedicated `safety_node` at the router level, before they ever reach the reasoning nodes. Furthermore, our architecture is built to transition seamlessly to **Azure Key Vault** and **Managed Identities**, ensuring that your enterprise data never leaves your secure, governed perimeter.
+
+### 4. Can I use this for departments outside of Sales and HR?
+
+Yes. Because the system is built with **Dynamic Context Ingestion**, it is highly modular. You can upload HR handbooks, IT security protocols, legal compliance documents, or project-specific technical specs in the sidebar, and the engine will instantly adapt its knowledge base to that specific domain without requiring a single line of code change.
+
+### 5. What makes the "Reasoning Trace" feature so important?
+
+In an enterprise environment, a "yes" or "no" answer is not enough—you need to know *why*. Our built-in **Reasoning Trace** UI allows developers and stakeholders to monitor the agent's logic flow in real-time. It reveals exactly which IQ layer was consulted and what policy clause triggered the decision, providing the total transparency required for corporate governance.
+
+---
+
 ## ⚙️ Quick Start Guide
 
 ```bash
