@@ -1,5 +1,8 @@
-langgraph
-langchain-google-genai
-langchain-community
 streamlit
 python-dotenv
+pandas
+openpyxl
+pypdf
+python-pptx
+langgraph
+# Add any other existing dependencies you already have here

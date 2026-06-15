@@ -9,7 +9,13 @@ The system operates as a finite state machine. The `router_node` determines the 
 
 ```mermaid
 graph TD
-    %% Nodes representing Agents and Logic Nodes
+    %% User Inputs
+    subgraph Inputs ["Data Inputs"]
+        User((User Query))
+        UserDocs[("Dynamic Files<br/>(PDF, XLSX, PPTX, TXT)")]
+    end
+
+    %% Reasoning & Orchestration Layer
     subgraph Orchestration ["Mediator & Logic Engine (LangGraph)"]
         RouterNode{"Router Agent<br/>(Contextual Router)"}
         PolicyAgent["Policy Mediator Agent"]
@@ -20,15 +26,16 @@ graph TD
 
     %% Integration with Microsoft IQ Layers
     subgraph IQ_Layers ["Microsoft Intelligence Layers"]
-        WorkIQ["Work IQ<br/>(Work Context & Routing)"]
+        WorkIQ["Work IQ<br/>(Contextual Routing)"]
         FoundryIQ["Foundry IQ<br/>(RAG Policy Grounding)"]
-        FabricIQ["Fabric IQ<br/>(Performance Data Analytics)"]
+        FabricIQ["Fabric IQ<br/>(Performance Analytics)"]
     end
 
-    %% User Flow
-    User((User Input)) -->|Intent Analysis| RouterNode
+    %% Updated Workflow
+    User -->|Intent Analysis| RouterNode
+    UserDocs -->|Context Injection| RouterNode
     
-    %% Routing Logic with IQ Mappings
+    %% Routing Logic
     RouterNode -->|PII/Risk Detected| SafetyAgent
     RouterNode -->|Policy Inquiry| WorkIQ
     WorkIQ --> RouterNode
@@ -48,16 +55,18 @@ graph TD
     InsightsAgent --> Final
     SafetyAgent --> Final
 
-    %% Styling for sophistication
+    %% Styling
     classDef agent fill:#f0f7ff,stroke:#0078d4,stroke-width:2px;
     classDef iq fill:#fef3e7,stroke:#d97706,stroke-width:2px;
     classDef route fill:#f5f5f5,stroke:#333,stroke-width:2px;
+    classDef input fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,stroke-dasharray: 5 5;
     
     class PolicyAgent,LogicAgent,InsightsAgent,SafetyAgent agent;
     class WorkIQ,FoundryIQ,FabricIQ iq;
     class RouterNode route;
-```
+    class UserDocs input;
 
+```
 
 ## 3. IQ Layer Integration Deep-Dive
 

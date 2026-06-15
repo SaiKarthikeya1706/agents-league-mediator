@@ -115,7 +115,7 @@ workflow.add_edge("safety_error", END)
 app = workflow.compile()
 
 # --- 5. Execution Interface ---
-def run_agent(user_query: str):
+def run_agent(user_query, context=""):
     """Interface for the Streamlit App"""
     # Invoke the LangGraph app
     final_state = app.invoke({"messages": [HumanMessage(content=user_query)]})
