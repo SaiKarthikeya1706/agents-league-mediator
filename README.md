@@ -4,7 +4,7 @@
 
 ## 🧠 Challenge Submission
 **Track:** Reasoning Agents with Microsoft Foundry  
-**Project Objective:** A dual-purpose analytical platform that combines strict organizational policy arbitration (**The Mediator**) with a powerful, search-enabled engine for real-time information discovery and complex problem-solving (**The Logic Engine**).
+**Project Objective:** A dual-purpose analytical platform that combines strict organizational policy arbitration (**The Mediator**) with a **5-agent autonomous enterprise framework** which is a powerful, search-enabled engine for real-time information discovery and complex problem-solving (**The Logic Engine**).
 
 ---
 
@@ -12,7 +12,7 @@
 In modern enterprise environments, requests (such as sales discounts) often lead to friction between departments. Manual, human-in-the-loop approvals are slow, inconsistent, and suffer from "precedent creep." Furthermore, current agents often lack the ability to bridge the gap between static policy and real-time business data analysis.
 
 ## 🚀 Our Solution
-The **Mediator & Logic Engine** is a durable, Python-based orchestration framework built with **LangGraph**. It replaces manual gatekeeping with an autonomous **Reasoning Engine** that:
+The **Mediator & Logic Engine** is a durable, Python-based orchestration **5-agent autonomous enterprise framework** built with **LangGraph**. It replaces manual gatekeeping with an autonomous **Reasoning Engine** that:
 
 1. **Policy Mediator (Foundry IQ Pattern):** Uses a dynamic RAG-based arbitration engine to ground all decisions in verified, company-approved `data/policy.txt` documentation.
 2. **Universal Logic Engine (Reasoning & Orchestration):** Leverages LangGraph to create durable, multi-step reasoning loops, ensuring the agent follows a strict logical path (Router → Policy/Search/Insights → Response).
