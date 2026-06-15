@@ -107,6 +107,21 @@ graph TD
 
 ---
 
+## 📸 Demonstration of Capabilities
+
+The Mediator & Logic Engine is built to handle complex enterprise scenarios. Below are examples of the system in action:
+
+* **Contextual Policy Arbitration:** The agent accurately cross-references uploaded policies to answer complex business rules regarding contract terms.	
+![Mediator & Logic Engine ](assets/Policy.png)
+
+* **Proactive Safety Guardrails:** The system automatically detects and blocks requests involving sensitive PII or security risks, ensuring compliance.	
+![Mediator & Logic Engine ](assets/security.png)
+
+* **Boundary-Aware Logic:** The agent maintains strict adherence to its knowledge base, refusing to hallucinate outside of the provided policy domain.
+![Mediator & Logic Engine ](assets/Boundary-Aware.png)
+
+---
+
 ## ⚙️ Quick Start Guide
 
 ```bash
