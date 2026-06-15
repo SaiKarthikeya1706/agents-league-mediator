@@ -84,3 +84,11 @@ The `router_node` functions as the **Cognitive Gatekeeper**. It uses an LLM-base
 * **State Management:** We use `Annotated[List[BaseMessage], operator.add]` within LangGraph. This ensures that every node in the graph has access to the full conversation context (Chat History) without needing to manually pass session data.
 * **Safety Fallback:** The safety check is placed at the **entry point** (The Router). By intercepting potentially sensitive inputs *before* they hit the specialized reasoning nodes, we reduce the blast radius of any "hallucination" or "prompt injection" risks.
 * **Modularity:** Each agent node is designed as a standalone function. This makes it trivial to swap the `search_node` for a more complex tool-calling agent (e.g., Tavily Search) in the future without refactoring the core graph.
+
+## 5. Operational Lifecycle & Scalability
+
+The Mediator & Logic Engine is architected for continuous improvement in an enterprise environment:
+
+* **Feedback Loop:** The expander UI component is designed to capture reasoning traces. These logs can be ingested by an observability tool (like LangSmith) to identify nodes where the agent’s logic deviated from human expectations.
+* **Version Control:** By maintaining policy.txt as a distinct asset, the system supports "Policy Versioning." You can swap out the policy file to reflect updated corporate governance without needing to re-deploy the underlying Python logic.
+* **Future-Proofing:** The modular AgentState allows for the future addition of "Memory Nodes." This would enable the system to remember previous policy arbitration rulings, turning the framework from a stateless arbitrator into a stateful, historical learning engine.
