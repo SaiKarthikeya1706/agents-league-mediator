@@ -5,44 +5,53 @@ The Mediator & Logic Engine is built on a **Stateful Orchestration Pattern** usi
 
 ```mermaid
 graph TD
-    %% User Interaction
-    subgraph UI ["1. User Interaction"]
-        User((User Query)) --> Streamlit[Streamlit App]
-        GitHub[GitHub Copilot Chat] -.-> Streamlit
+    %% Nodes representing Agents and Logic Nodes
+    subgraph Orchestration ["Mediator & Logic Engine (LangGraph)"]
+        RouterNode{"Router Agent<br/>(Contextual Router)"}
+        PolicyAgent["Policy Mediator Agent"]
+        LogicAgent["General Research Agent"]
+        InsightsAgent["Performance Insights Agent"]
+        SafetyAgent["Safety/Guardrail Agent"]
     end
 
-    %% Reasoning Engine
-    subgraph Reasoning ["2. Reasoning & Orchestration (LangGraph)"]
-        Streamlit --> Router{Router Node}
-        Router --> |Route Intent| Policy[Policy/Insights/Search Node]
-        Policy --> |Enforce Logic| Response[Response Generator Node]
-        Safety[Safety Node] -.-> Router
-        Safety -.-> Response
+    %% Integration with Microsoft IQ Layers
+    subgraph IQ_Layers ["Microsoft Intelligence Layers"]
+        WorkIQ["Work IQ<br/>(Work Context & Routing)"]
+        FoundryIQ["Foundry IQ<br/>(RAG Policy Grounding)"]
+        FabricIQ["Fabric IQ<br/>(Performance Data Analytics)"]
     end
 
-    %% IQ Layers
-    subgraph IQ ["3. Data Grounding & Insights"]
-        Policy --> |RAG Pattern| FIQ[Foundry IQ: policy.txt]
-        Policy --> |Semantic Analysis| FabIQ[Fabric IQ: synthetic_learners.json]
-        Policy --> |Contextual Routing| WIQ[Work IQ / M365 Copilot]
-    end
-
-    %% Production/Dev
-    subgraph Dev ["4. Production Strategy"]
-        GitHubCode[GitHub / CI/CD] --> pytest[pytest / Testing]
-        pytest --> Deploy[Azure Production]
-        Deploy --> AKV[Azure Key Vault]
-        Deploy --> MI[Managed Identities]
-    end
-
-    %% Stylings
-    classDef node fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
-    classDef iq fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
-    classDef safety fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
+    %% User Flow
+    User((User Input)) -->|Intent Analysis| RouterNode
     
-    class Router,Policy,Response node;
-    class FIQ,FabIQ,WIQ iq;
-    class Safety safety;
+    %% Routing Logic with IQ Mappings
+    RouterNode -->|PII/Risk Detected| SafetyAgent
+    RouterNode -->|Policy Inquiry| WorkIQ
+    WorkIQ --> RouterNode
+    
+    RouterNode -->|Route| PolicyAgent
+    PolicyAgent <-->|query_knowledge_base| FoundryIQ
+    
+    RouterNode -->|Route| LogicAgent
+    LogicAgent <-->|search_discovery| FoundryIQ
+    
+    RouterNode -->|Route| InsightsAgent
+    InsightsAgent <-->|semantic_analysis| FabricIQ
+
+    %% End Path
+    PolicyAgent --> Final(Final Response)
+    LogicAgent --> Final
+    InsightsAgent --> Final
+    SafetyAgent --> Final
+
+    %% Styling for sophistication
+    classDef agent fill:#f0f7ff,stroke:#0078d4,stroke-width:2px;
+    classDef iq fill:#fef3e7,stroke:#d97706,stroke-width:2px;
+    classDef route fill:#f5f5f5,stroke:#333,stroke-width:2px;
+    
+    class PolicyAgent,LogicAgent,InsightsAgent,SafetyAgent agent;
+    class WorkIQ,FoundryIQ,FabricIQ iq;
+    class RouterNode route;
 ```
 
 
