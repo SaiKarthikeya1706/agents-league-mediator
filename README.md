@@ -167,8 +167,6 @@ In an enterprise environment, a "yes" or "no" answer is not enough—you need to
 | :--- | :--- |
 | **Source Code** | [GitHub Repository](https://github.com/SaiKarthikeya1706/agents-league-mediator) |
 | **Live Demonstration** | [Streamlit App](https://agents-league-mediator.streamlit.app/) |
-| **Video Walkthrough** | [YouTube Demo](https://youtu.be/uAPt9gvdrX8?si=0tsOZGhnaXzJnwcb) |
-
 ---
 
 ## ⚙️ Quick Start Guide
