@@ -1,3 +1,53 @@
+# 🛡️ Mediator & Logic Engine
+### Autonomous Enterprise Arbitration Framework
+
+![Mediator & Logic Engine Logo](assets/agents_AI.jpg)
+
+[![Python](https://img.shields.io/badge/Python-3.9+-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![LangGraph](https://img.shields.io/badge/Orchestration-LangGraph-1c3d5a)](https://www.langchain.com/langgraph)
+[![Gemini](https://img.shields.io/badge/LLM-Gemini%202.5%20Flash-4285F4?logo=google)](https://ai.google.dev/)
+[![Vector Store](https://img.shields.io/badge/Vector%20Store-Chroma-orange)](https://www.trychroma.com/)
+[![Streamlit](https://img.shields.io/badge/UI-Streamlit-ff4b4b?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Streamlit%20Cloud-brightgreen)](https://agents-league-mediator.streamlit.app/)
+
+---
+
+## 🧠 Challenge Submission
+**Track:** Reasoning Agents with Microsoft Foundry
+**Project Objective:** A dual-purpose analytical platform combining strict organizational policy arbitration (**The Mediator**) with a **5-agent autonomous enterprise framework** for real-time information discovery, dynamic document analysis, and complex problem-solving — grounded in a real, vector-based retrieval pipeline rather than raw context stuffing.
+
+---
+
+## ⚖️ The Problem
+In modern enterprise environments, requests (such as sales discounts) often lead to friction between departments. Manual, human-in-the-loop approvals are slow, inconsistent, and suffer from "precedent creep." Furthermore, most agents lack the ability to bridge the gap between static policy and real-time business data analysis, and many "RAG" implementations quietly skip retrieval entirely, just dumping full documents into the prompt.
+
+## 🚀 Our Solution
+The **Mediator & Logic Engine** is a durable, Python-based orchestration framework built with **LangGraph**. It replaces manual gatekeeping with an autonomous **Reasoning Engine** that:
+
+1. **Dynamic Context Ingestion** — Users upload PDFs, Excel sheets, PPTs, or TXT files directly through the UI; the engine adapts its knowledge base in real time.
+2. **Policy Mediator (Foundry IQ Pattern)** — Grounds every ruling using genuine **retrieval-augmented generation**: the policy corpus is chunked, embedded, and indexed in a vector store, then queried by similarity search at inference time — not stuffed wholesale into the prompt.
+3. **Universal Logic Engine (Reasoning & Orchestration)** — LangGraph drives durable, multi-step reasoning loops: `Router → Policy / Search / Insights → Response`.
+4. **Data-Driven Insights (Fabric IQ Pattern)** — Analyzes structured performance data directly, giving manager-level insights without forcing structured data through a chunking pipeline it doesn't need.
+
+---
+
+## 🛠️ Technical Architecture & IQ Mapping
+
+| Microsoft IQ Layer | Our Implementation | Technical Purpose |
+| :--- | :--- | :--- |
+| **Foundry IQ** | `policy_node` — Chroma vector store + Gemini embeddings | Grounds policy rulings via top-k similarity search over indexed source documents |
+| **Fabric IQ** | `insights_node` — Structured JSON analysis | Analyzes structured team performance data directly (full-context, no chunking needed) |
+| **Work IQ** | `router_node` — Contextual routing | Classifies intent and routes to the correct agent node |
+
+### Retrieval Pipeline (the part that makes this *actually* RAG)
+
+policy.txt ──► RecursiveCharacterTextSplitter (800 chars, 100 overlap)
+──► Gemini embeddings (gemini-embedding-001)
+──► Chroma vector store (persisted, pre-indexed at build time)
+User query ──► embed query ──► similarity_search(k=4) ──► top-k relevant chunks
+──► passed to Gemini 2.5 Flash
+
+
 User-uploaded documents get the same treatment via an ephemeral, session-scoped Chroma index — built once per upload, queried the same way, never persisted, so nothing sensitive lingers after the session ends.
 
 ## Architecture Diagram:
