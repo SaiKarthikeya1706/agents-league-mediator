@@ -1,45 +1,14 @@
-# Mediator & Logic Engine: Autonomous Enterprise Arbitration Framework
-
-![Mediator & Logic Engine Logo](assets/agents_AI.jpg)
-
-## 🧠 Challenge Submission
-**Track:** Reasoning Agents with Microsoft Foundry  
-**Project Objective:** A dual-purpose analytical platform that combines strict organizational policy arbitration (**The Mediator**) with a **5-agent autonomous enterprise framework** for real-time information discovery, dynamic document analysis, and complex problem-solving.
-
----
-
-## ⚖️ The Problem
-In modern enterprise environments, requests (such as sales discounts) often lead to friction between departments. Manual, human-in-the-loop approvals are slow, inconsistent, and suffer from "precedent creep." Furthermore, most agents lack the ability to bridge the gap between static policy and real-time business data analysis.
-
-## 🚀 Our Solution
-The **Mediator & Logic Engine** is a durable, Python-based orchestration **5-agent autonomous enterprise framework** built with **LangGraph**. It replaces manual gatekeeping with an autonomous **Reasoning Engine** that:
-
-1. **Dynamic Context Ingestion:** Users can upload PDFs, Excel sheets, PPTs, or TXT files directly through the UI. The engine automatically adapts its knowledge base to these documents in real-time.
-2. **Policy Mediator (Foundry IQ Pattern):** Uses a dynamic RAG-based arbitration engine to ground all decisions in verified, company-approved documentation.
-3. **Universal Logic Engine (Reasoning & Orchestration):** Leverages LangGraph to create durable, multi-step reasoning loops, following a strict path (Router → Policy/Search/Insights → Response).
-4. **Data-Driven Insights (Fabric IQ Pattern):** Analyzes structured performance data to provide manager-level insights, enabling the agent to reason beyond simple text retrieval.
-
----
-
-## 🛠️ Technical Architecture & IQ Mapping
-
-| Microsoft IQ Layer | Our Implementation | Technical Purpose |
-| :--- | :--- | :--- |
-| **Foundry IQ** | `policy_node` (RAG Pattern) | Grounds policy rulings in a verified source. |
-| **Fabric IQ** | `insights_node` (Semantic Analysis) | Analyzes structured team performance data. |
-| **Work IQ** | `router_node` (Contextual Routing) | Routes intent to the correct agent node. |
+User-uploaded documents get the same treatment via an ephemeral, session-scoped Chroma index — built once per upload, queried the same way, never persisted, so nothing sensitive lingers after the session ends.
 
 ## Architecture Diagram:
 
 ```mermaid
 graph TD
-    %% User Inputs
     subgraph Inputs ["Data Inputs"]
         User((User Query))
         UserDocs[("Dynamic Files<br/>(PDF, XLSX, PPTX, TXT)")]
     end
 
-    %% Reasoning & Orchestration Layer
     subgraph Orchestration ["Mediator & Logic Engine (LangGraph)"]
         RouterNode{"Router Agent<br/>(Contextual Router)"}
         PolicyAgent["Policy Mediator Agent"]
@@ -48,116 +17,111 @@ graph TD
         SafetyAgent["Safety/Guardrail Agent"]
     end
 
-    %% Integration with Microsoft IQ Layers
+    subgraph Retrieval ["Vector Retrieval Layer"]
+        Embed["Gemini Embeddings<br/>(gemini-embedding-001)"]
+        VectorDB[("Chroma Vector Store<br/>(chunked & indexed)")]
+    end
+
     subgraph IQ_Layers ["Microsoft Intelligence Layers"]
         WorkIQ["Work IQ<br/>(Contextual Routing)"]
         FoundryIQ["Foundry IQ<br/>(RAG Policy Grounding)"]
         FabricIQ["Fabric IQ<br/>(Performance Analytics)"]
     end
 
-    %% Updated Workflow
     User -->|Intent Analysis| RouterNode
-    UserDocs -->|Context Injection| RouterNode
-    
-    %% Routing Logic
+    UserDocs -->|Ephemeral Index| VectorDB
+
     RouterNode -->|PII/Risk Detected| SafetyAgent
     RouterNode -->|Policy Inquiry| WorkIQ
     WorkIQ --> RouterNode
-    
+
     RouterNode -->|Route| PolicyAgent
-    PolicyAgent <-->|query_knowledge_base| FoundryIQ
-    
+    PolicyAgent <-->|similarity_search top-k| VectorDB
+    VectorDB <-->|embed| Embed
+    PolicyAgent <-->|grounded generation| FoundryIQ
+
     RouterNode -->|Route| LogicAgent
     LogicAgent <-->|search_discovery| FoundryIQ
-    
+
     RouterNode -->|Route| InsightsAgent
     InsightsAgent <-->|semantic_analysis| FabricIQ
 
-    %% End Path
     PolicyAgent --> Final(Final Response)
     LogicAgent --> Final
     InsightsAgent --> Final
     SafetyAgent --> Final
 
-    %% Styling
     classDef agent fill:#f0f7ff,stroke:#0078d4,stroke-width:2px;
     classDef iq fill:#fef3e7,stroke:#d97706,stroke-width:2px;
     classDef route fill:#f5f5f5,stroke:#333,stroke-width:2px;
     classDef input fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,stroke-dasharray: 5 5;
-    
+    classDef vector fill:#fff0f6,stroke:#c2185b,stroke-width:2px;
+
     class PolicyAgent,LogicAgent,InsightsAgent,SafetyAgent agent;
     class WorkIQ,FoundryIQ,FabricIQ iq;
     class RouterNode route;
     class UserDocs input;
-
+    class Embed,VectorDB vector;
 ```
 
 ---
 
 ## 📊 Key Features
-* **Multi-Format Support:** Seamlessly processes **PDF, XLSX, PPTX, and TXT** files via an intuitive sidebar uploader.
-* **Autonomous Router:** Automatically classifies requests and selects the best agent for the task.
-* **Observability:** Built-in **Reasoning Traces** in the UI allow developers to monitor the agent's logic flow in real-time.
+* **Real Vector-Based RAG** — Chroma + Gemini embeddings, not context-stuffing dressed up as retrieval.
+* **Multi-Format Support** — Seamlessly processes PDF, XLSX, PPTX, and TXT files via an intuitive sidebar uploader.
+* **Autonomous Router** — Automatically classifies requests and selects the best agent for the task.
+* **Observability** — Built-in Reasoning Traces in the UI let you monitor the agent's logic flow in real time.
+* **Ephemeral User-Upload Indexing** — Session-scoped vector index for uploaded docs; nothing persists after you close the tab.
 
 ---
 
 ## 🛡️ Responsible AI & Security
-* **Input Guardrails:** A proactive `safety_node` intercepts PII/Credentials at the router level.
-* **Production Ready:** Architected to transition to **Azure Key Vault** and **Managed Identities** for enterprise-grade security.
+* **Input Guardrails** — A proactive `safety_node` intercepts PII/credential-related requests at the router level, before they ever reach a reasoning node.
+* **Secrets Hygiene** — API keys live exclusively in `.env` (gitignored) locally and in Streamlit Cloud's Secrets manager in production; never committed, never hardcoded. Git history has been scrubbed of any prior exposure.
+* **Fictional Sample Data** — The pre-loaded `policy.txt` and `synthetic_learners.json` are illustrative, not real company data — clearly labeled as such in the UI.
+* **Production Ready** — Architected to transition to **Azure Key Vault** and **Managed Identities** for enterprise-grade secrets management.
 
 ---
 
 ## 🏠 User Interface & Experience
 
-The Mediator & Logic Engine features an intuitive, high-performance interface built with Streamlit that prioritizes both usability and observability:
+* **Unified Control Array** — A sidebar "Command Center" for uploading custom policy/performance documents, clearing conversation history, and verifying active intelligence layers.
+* **Transparent Reasoning** — Every response ships with a Reasoning Trace expander showing which path the router took and which IQ layer was consulted.
+* **Interactive Context Awareness** — Real-time feedback on whether you're grounded in default or custom-uploaded context.
 
-* **Unified Control Array:** A dedicated sidebar acts as the "Command Center," allowing users to instantly upload custom policy and performance documents, clear conversation history, and verify active intelligence layers.
-
-* **Transparent Reasoning:** Every response is accompanied by a Reasoning Trace expander, providing a "glass-box" view into how the agent categorized your request, which IQ layers it consulted, and how it reached its final conclusion.
-
-* **Interactive Context Awareness:** The interface provides real-time feedback on the active context (Default vs. Custom), ensuring users always know exactly which data source is grounding the agent's decisions
-
-![Mediator & Logic Engine ](assets/home.png)
-
+![Mediator & Logic Engine](assets/home.png)
 
 ---
 
 ## 📸 Demonstration of Capabilities
 
-The Mediator & Logic Engine is built to handle complex enterprise scenarios. Below are examples of the system in action:
+* **Contextual Policy Arbitration** — Cross-references retrieved policy chunks to answer complex business rules regarding contract terms.
+![Mediator & Logic Engine](assets/Policy.png)
 
-* **Contextual Policy Arbitration:** The agent accurately cross-references uploaded policies to answer complex business rules regarding contract terms.	
-![Mediator & Logic Engine ](assets/Policy.png)
+* **Proactive Safety Guardrails** — Automatically detects and blocks requests involving sensitive PII or security risks.
+![Mediator & Logic Engine](assets/security.png)
 
-* **Proactive Safety Guardrails:** The system automatically detects and blocks requests involving sensitive PII or security risks, ensuring compliance.	
-![Mediator & Logic Engine ](assets/security.png)
-
-* **Boundary-Aware Logic:** The agent maintains strict adherence to its knowledge base, refusing to hallucinate outside of the provided policy domain.
-![Mediator & Logic Engine ](assets/Boundary-Aware.png)
+* **Boundary-Aware Logic** — Maintains strict adherence to retrieved context, refusing to hallucinate outside the provided policy domain.
+![Mediator & Logic Engine](assets/Boundary-Aware.png)
 
 ---
 
 ## ❓ Frequently Asked Questions
 
-### 1. How is this different from standard chatbots or generic AI tools like ChatGPT or Gemini?
+### 1. How is this different from standard chatbots like ChatGPT or Gemini?
+Standard AI tools operate as "black boxes" relying on broad, static training data. The Mediator & Logic Engine is a **durable, enterprise-grade framework**: every response is traced back to a specific, retrieved chunk of your policy or data via LangGraph's deterministic execution path, minimizing hallucination and preserving auditability.
 
-Standard AI tools operate as "black boxes" that rely on broad, static training data. The **Mediator & Logic Engine** is a **durable, enterprise-grade framework**. It doesn't guess; it is **grounded**. By using LangGraph, we create a deterministic execution path where every response is traced back to your specific policy or data, ensuring zero hallucination and complete auditability.
-
-### 2. Why use this instead of a simple RAG (Retrieval-Augmented Generation) application?
-
-Most RAG applications are simple "search-and-retrieve" tools that provide documents to an LLM. Our engine acts as an **Active Arbitrator**. It doesn't just find documents; it understands intent via our **Work IQ Router**, evaluates risk via our **Safety Guardrails**, and performs complex business analysis using our **Fabric IQ Insights** layer. It is a multi-step, reasoning-based orchestrator, not a simple query tool.
+### 2. Why use this instead of a simple RAG application?
+Most "RAG" demos skip the "R" — they just paste an entire document into the prompt and call it retrieval. This engine performs **real retrieval**: documents are chunked, embedded with Gemini's embedding model, indexed in Chroma, and queried via similarity search at inference time, returning only the top-k relevant chunks. On top of that retrieval layer sits an **Active Arbitrator** — a Work IQ router for intent classification, Safety Guardrails for risk interception, and a Fabric IQ layer for structured-data reasoning that doesn't need chunking at all.
 
 ### 3. How secure is my data within this system?
+Sensitive requests are intercepted by `safety_node` at the router level before reaching any reasoning node. API keys are never hardcoded or committed — they're managed via `.env` locally (gitignored) and Streamlit Cloud Secrets in production, with a documented path to Azure Key Vault and Managed Identities for enterprise deployment.
 
-Security is baked into the architecture. We implement a "Safety-First" design: sensitive requests are intercepted by our dedicated `safety_node` at the router level, before they ever reach the reasoning nodes. Furthermore, our architecture is built to transition seamlessly to **Azure Key Vault** and **Managed Identities**, ensuring that your enterprise data never leaves your secure, governed perimeter.
+### 4. Can I use this for departments outside Sales and HR?
+Yes — Dynamic Context Ingestion makes the system domain-agnostic. Upload HR handbooks, IT security protocols, legal compliance documents, or technical specs, and the vector index adapts instantly with zero code changes.
 
-### 4. Can I use this for departments outside of Sales and HR?
-
-Yes. Because the system is built with **Dynamic Context Ingestion**, it is highly modular. You can upload HR handbooks, IT security protocols, legal compliance documents, or project-specific technical specs in the sidebar, and the engine will instantly adapt its knowledge base to that specific domain without requiring a single line of code change.
-
-### 5. What makes the "Reasoning Trace" feature so important?
-
-In an enterprise environment, a "yes" or "no" answer is not enough—you need to know *why*. Our built-in **Reasoning Trace** UI allows developers and stakeholders to monitor the agent's logic flow in real-time. It reveals exactly which IQ layer was consulted and what policy clause triggered the decision, providing the total transparency required for corporate governance.
+### 5. What makes the Reasoning Trace feature important?
+In an enterprise setting, "yes" or "no" isn't enough — you need to know *why*. The Reasoning Trace reveals which IQ layer was consulted, which retrieved chunk triggered the decision, and what path the router took, giving the transparency corporate governance requires.
 
 ---
 
@@ -167,24 +131,37 @@ In an enterprise environment, a "yes" or "no" answer is not enough—you need to
 | :--- | :--- |
 | **Source Code** | [GitHub Repository](https://github.com/SaiKarthikeya1706/agents-league-mediator) |
 | **Live Demonstration** | [Streamlit App](https://agents-league-mediator.streamlit.app/) |
+
 ---
 
 ## ⚙️ Quick Start Guide
 
 ```bash
 # 1. Clone the repository
-git clone [https://github.com/SaiKarthikeya1706/agents-league-mediator](https://github.com/SaiKarthikeya1706/agents-league-mediator)
+git clone https://github.com/SaiKarthikeya1706/agents-league-mediator
 cd agents-league-mediator
 
-# 2. Setup environment
+# 2. Set up environment
 python3 -m venv venv
-source venv/bin/activate 
+source venv/bin/activate
 
 # 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Configure .env
+# 4. Configure your API key
 echo "GOOGLE_API_KEY=your_key_here" > .env
 
-# 5. Launch the application
+# 5. Build the vector index (one-time, or whenever policy.txt changes)
+python -m src.ingest
+
+# 6. Launch the application
 streamlit run src/app.py
+```
+
+> **Note:** Step 5 is required before first run — it builds the Chroma vector store that grounds every policy query. If you update `data/policy.txt`, re-run `python -m src.ingest` to refresh the index.
+
+---
+
+## 🧪 Tech Stack
+
+`LangGraph` · `Google Gemini 2.5 Flash` · `Gemini Embeddings (gemini-embedding-001)` · `Chroma` (via `langchain-chroma`) · `Streamlit` · `PyPDF` · `python-pptx` · `pandas`
