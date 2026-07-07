@@ -11,7 +11,7 @@ root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if root_path not in sys.path:
     sys.path.append(root_path)
 
-from src.main import run_agent 
+from src.main import run_agent
 
 # --- Setup & Config ---
 load_dotenv()
@@ -42,7 +42,7 @@ def get_file_text(file):
     return text
 
 # --- Session State ---
-if "messages" not in st.session_state: 
+if "messages" not in st.session_state:
     st.session_state.messages = []
 
 def main():
@@ -52,13 +52,14 @@ def main():
     with st.sidebar:
         st.markdown("## ⚙️ CONTROL ARRAY")
         st.write("📦 **Pre-loaded Knowledge:**")
-        st.caption("✅ `policy.txt`")
+        st.caption("✅ `policy.txt` (vector-indexed)")
         st.caption("✅ `synthetic_learners.json`")
         st.divider()
-        
+        st.caption("_Note: pre-loaded policy & performance data are fictional samples, not real company data._")
+
         uploaded_files = st.file_uploader(
-            "Upload Custom Docs", 
-            accept_multiple_files=True, 
+            "Upload Custom Docs",
+            accept_multiple_files=True,
             type=['pdf', 'xlsx', 'xls', 'pptx', 'ppt', 'txt'],
             key="my_uploader"
         )
@@ -69,45 +70,36 @@ def main():
             st.rerun()
 
     for msg in st.session_state.messages:
-        with st.chat_message(msg["role"]): st.markdown(msg["content"])
-    
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+
     if user_query := st.chat_input("Ask about company policy, team performance, or general research..."):
         st.session_state.messages.append({"role": "user", "content": user_query})
-        with st.chat_message("user"): st.markdown(user_query)
-        
+        with st.chat_message("user"):
+            st.markdown(user_query)
+
         with st.chat_message("assistant"):
             with st.spinner("Agent is reasoning..."):
                 try:
-                    # 1. Structure the context explicitly
-                    file_context = "--- SYSTEM KNOWLEDGE BASE ---\n"
-                    
-                    if os.path.exists("data/policy.txt"):
-                        with open("data/policy.txt", "r") as f:
-                            file_context += f"[GLOBAL POLICY]: {f.read()}\n"
-                    
-                    if os.path.exists("data/synthetic_learners.json"):
-                        with open("data/synthetic_learners.json", "r") as f:
-                            file_context += f"[PERFORMANCE DATA]: {f.read()}\n"
-                    
-                    # 2. Append User Uploads clearly
+                    uploaded_text = ""
                     if uploaded_files:
-                        file_context += "\n--- USER PROVIDED DOCUMENTS (PRIORITIZE THESE) ---\n"
                         for file in uploaded_files:
-                            file_context += get_file_text(file) + "\n"
+                            uploaded_text += get_file_text(file) + "\n"
                         st.info(f"✅ Including {len(uploaded_files)} file(s) in analysis.")
-                    
-                    # 3. Execution
-                    result = run_agent(user_query, context=file_context)
-                    
+
+                    result = run_agent(user_query, uploaded_text=uploaded_text)
+
                     with st.expander("🔍 Reasoning Trace & Observability"):
                         st.write(f"**Targeted Path:** {result.get('path', 'Unknown').upper()}")
                         st.write(f"**Orchestration Status:** Success")
-                    
+
                     st.markdown(result['content'])
                     st.session_state.messages.append({"role": "assistant", "content": result['content']})
                 except Exception as e:
-                    st.error(f"Execution Error: {e}")
-        st.rerun()
+                    error_msg = f"⚠️ Execution Error: {e}"
+                    st.error(error_msg)
+                    st.session_state.messages.append({"role": "assistant", "content": error_msg})
+            st.rerun()
 
 if __name__ == "__main__":
     main()
